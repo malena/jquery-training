@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>JavaScript Training</title>
+        <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:400,700,300' rel='stylesheet' type='text/css'>
+        <link href='css/global.css' rel='stylesheet' type='text/css'>
+        <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+        <script src='js/jquery.min.js'></script>
+        <script src='js/TweenMax.min.js'></script>
+        <script src='js/scripts.js'></script>
+        <script>
+        $(function(){
+            new TrainingNotes();
+        });
+        </script>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <article>
+            <header>
+                <h1>JS Fundamentals</h1>
+            </header>
+            <section class="introduction">
+                <ol>
+                    <li><a href="#basics">jQuery Basics</a></li>
+                    <li><a href="#events" >Events</a></li>
+                    <li><a href="#best-practices">Best Practices</a></li>
+                    <li><a href="#utilities">Utilities</a></li>
+                    <li><a href="ajax">Ajax</a></li>
+                    <li><a href="deferreds">Deferreds</a></li>
+                    <li><a href="templates">Templates</a></li>
+                </ol>
+            </section>
+            <header>
+                <h2><a name="basics">jQuery Basics</a></h2>
+            </header>
+
+
+            <header>
+                <h3>jQuery Objects are array-like</h3>
+            </header>
+            <section>
+                <p>jQuery implicitly iterates. So when you call jQuery methods on jQuery objects, you don't need to loop explicitly.</p>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        $("li").html("Awesome!");
+                    </code>
+                </pre>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        $("li").each(function(){
+                            $(this).html("Awesome")
+                        });
+                    </code>
+                </pre>
+            </section>
+
+            <header>
+                <h3>jQuery Objects are snapshots</h3>
+            </header>
+            <section>
+                <p>When you select elements from the document, you select them as they exist in the document at the moment the jQuery function is called.</p>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        var allDivsInTheDocument = $("div");
+                        allDivsInTheDocument.length // 10
+                    </code>
+                </pre>
+                <p>The existing jQuery objects you have don't chage, even after adding more elements!</p>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        $('&#60;div&#47;>&#60;div&#47;>&#60;div&#47;>').appendTo("#target");
+                        allDivsInTheDocument.length // 10
+                    </code>
+                </pre>
+                <p>Selecting elements from the document by calling the jQuery function again will create a new snapshot.</p>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        var allDivsInTheDocumentNow = $("div");
+                        allDivsInTheDocumentNow.length // 13
+                    </code>
+                </pre>
+            </section>
+
+            <header>
+                <h3>Selecting elements</h3>
+            </header>
+            <section>
+                <p>You can use standard CSS selectors.</p>
+                <pre class="prettyprint">
+                    <code class="language-js">
+            var allDivsInTheDocument = $("div");
+            var anchorChildrenOfParagraphs = $("p > a");
+            var emailInputsInsideMyform = $("#my-form input[name='email']");
+                    </code>
+                </pre>
+                <p>Along with standard CSS selectors, you can use custom jQuery selectors. Custom jQuery selectors are much more useful when used in certain scenarios like this.</p>
+                <pre class="prettyprint"><code class="language-js">
+                var currentlyAnimatingDivs = $("div:animated");
+                $("p").on("click", function() {
+                    var elem = $(this);
+                    if (!elem.is(":animated")) {
+                        elem.slideUp(3000).slideDown(500);
+                    }
+                }); 
+                </code></pre>
+                <p>Avoid custom jQuery selectors when you don't need them, because they prevent jQuery from taking advantage of native DOM methods.</p>
+                <p>Using a querySelectorAll-supported selector will be significantly faster in modern browsers. </p>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                    $("form input:submit").submit();
+                    $("form input[type='submit']").submit();
+                    </code>
+                </pre>
+            </section>
+            <header>
+                <h3>Filtering elements</h3>
+            </header>
+            <section>
+                <p>The "not" method filters the selected set of elements down to the subset that doesn't match the given selector. This could be anywhere from 0 to all of the initial set of elements.</p>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        var divs = $("div");
+                        var divsNotAnimating = divs.not(":animated");
+                        var divsNotAnimating = divs.filter(":not(:animated)");
+                        var divsNotAnimating = $("div:not(:animated)");
+                    </code>
+                </pre>
+                <p>There are many jQuery custom selectors that can be used for filtering.</p>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        var firstDiv = $("div:first");
+                        var lastDiv = $("div:last");
+                        var secondDiv = $("div:eq(1)");
+                        var divsContainingAnchors = $("div:has(a)");
+                    </code>
+                </pre>
+                <p>And for most of them, there exists a corresponding filtering method.</p>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        var firstDiv = divs.first();
+                        var lastDiv = divs.last();
+                        var secondDiv = divs.eq(1);
+                        var divsContainingAnchors = divs.has("a");
+                    </code>
+                </pre>
+            </section>
+
+            <header>
+                <h3>Traversing the DOM</h3>
+            </header>
+
+            <section>
+                <p>You can find all descendant elements of an element or all children of an element. There are all kinds of traversal methods. Parents, children, siblings, you name it.</p>
+                <pre class="prettyprint">
+                    <code class="language-js">
+    var form = $("#my-form");
+    var inputsInForm = form.find("input");
+    var childrenOfForm = form.children();
+    $("h1").siblings().children(":first-child").next().addClass("highlight");
+    $("li").parent().prevAll().addClass("highlight");
+                    </code>
+                </pre>
+                <p>Elements don't have to be in the document to be traversable.</p>
+                <pre class="prettyprint">
+                    <code class="language-js">
+$("&#60;p>&#60;i/>&#60;b/>&#60;/p>");                               // [&#60;p>&#60;i>&#60;/i>&#60;b>&#60;/b>&#60;/p>]
+$("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children();                    // [&#60;i>​&#60;/i>​, &#60;b>​&#60;/b>​]
+$("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x");          // [&#60;i>​x&#60;/i>​, &#60;b>x​&#60;/b>​]
+$("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x").parent(); // [&#60;p>&#60;i>x&#60;/i>&#60;b>x&#60;/b>&#60;/p>]
+                    </code>
+                </pre>
+            </section>
+
+            <header>
+                <h3>Getters and Setters</h3>
+            </header>
+
+            <section>
+                <p>jQuery methods are both setters, modifying every selected element</p>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        $("li").html("<b>Hello</b> <i>world</i>");
+                        $("li").text("<b>Hello</b> <i>world</i>");
+                    </code>
+                </pre>
+                <p>And getters. Note that methods that work as both getter and setter will only return the value for the FIRST selected element. With a few notable exception, of course.</p>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        $("li").html(); // "<i>item 1</i> content"
+                        $("li").text(); // "item 1 contentitem 2 content item 3 contentitem 4 content"
+                    </code>
+                </pre>
+                <pre class="prettyprint">
+                    <code class="language-js">
+
+                        // Most methods that work as setters and getters will also accept a
+                        // callback that can be used to programmatically change values. Think
+                        // of this as a "combo" getter + setter.
+                        $("li").html(function(index, value) {
+                          return "<b>" + index + "</b> " + value;
+                        });
+                    </code>
+                </pre>
+                <pre class="prettyprint">
+                    <code class="language-js">
+
+                        // The "each" method can be used to do the same thing more explicitly.
+                        $("li").each(function(index) {
+                          var elem = $(this);
+                          elem.html( "<b>" + index + "</b> " + elem.html() );
+                        });
+                    </code>
+                </pre>
+            </section>
+            <header>
+                <h3>Attributes and Settings</h3>
+            </header>
+            <section>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        $("img:first").each(function() {
+                            img = $(this);
+
+                            // Set the src attribute of the image.
+                            img.attr("src", "/static/img/sample.gif");
+
+                            // Get the src attribute.
+                            console.log( img.attr("src") ); // "/static/img/sample.gif"
+                            // Get the src property with jQuery.
+                            console.log( img.prop("src") ); // "http://bocoup.com/static/img/sample.gif"
+                            // But if you already have a DOM element reference, you can access
+                            // properties directly from the element. This is very efficient!
+                            console.log( this.src );        // "http://bocoup.com/static/img/sample.gif"
+                            // Also, this is how you set and unset a boolean attribute. To disable an
+                            // element, you set the "disabled" attribute to "disabled". To re-enable
+                            // the element, you remove the attribute.
+                            img.attr("disabled", "disabled");
+                            img.removeAttr("disabled");
+
+                            // To disable or re-enable an element using a boolean property, you just
+                            // set the property value to true or false. Much nicer!
+                            img.prop("disabled", true);
+                            img.prop("disabled", false);
+                        });
+                    </code>
+                </pre>
+            </section>
+            <header>
+                <h3>Creating new elements</h3>
+            </header>
+            <section>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        // When creating elements, you can add attributes, properties, content, etc.
+                        var graph = $('<p id="test" class="fancy"><b>hello</b> <i>world</i></p>');
+
+                        // You can do the same things (and more) with jQuery methods.
+                        var graph = $("<p/>");
+                        graph.prop("id", "test");
+                        graph.addClass("fancy");
+                        graph.html("<b>hello</b> <i>world</i>");
+                        graph.on("click", function() {
+                          console.log( $(this).text() );
+                        });
+
+                        // Ever since jQuery 1.4, you can also pass in an options object as the
+                        // second argument to the jQuery function when creating a new element.
+                        var graph = $("<p/>", {
+                          id: "test",
+                          className: "fancy",
+                          html: "<b>hello</b> <i>world</i>",
+                          click: function() {
+                            console.log( $(this).text() );
+                          }
+                        });
+                    </code>
+                </pre>
+            </section>
+            <section>
+                <h2><a name="events">Events</a></h2>
+                <h3>Event Delegation</h3>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        // Internally, this is exactly what jQuery event delegation does. Except
+                        // the selector is specified between the event types and the handler,
+                        // `this` is the element that matched that selector, and it's MUCH more
+                        // efficient than if it was done manually with .closest().
+                        $(document).on("mouseover mouseout", "li", function(event) {
+                          $(this).toggleClass("highlight");
+                        });
+
+
+
+                        // And of course, because you're binding the event handler to a parent
+                        // element, you don't need to re-bind event handlers every time you add
+                        // new descendant elements matching that selector.
+                        $("li").clone().insertAfter("li");
+                    </code>
+                </pre>
+                <h3>Stopping Propragation</h3>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        // This is just for illustrative purposes!
+                        $("*").add([document, window]).on("click", function() {
+                          console.log(this);
+                        });
+
+                        // So, what if you used `return false` to prevent the default action?
+                        // You'd also be stopping propagation, in a way that's not very easy
+                        // to troubleshoot. Don't return false in your event handlers!
+                        $("a").on("click", function() {
+                          // Log stuff.
+                          console.log("I was just clicked!");
+                          // Prevent the default action AND stop event propagation. Oops?
+                          return false;
+                        });
+
+                        // This prevents default, but doesn't stop propagation.
+                        $("a").on("click", function(event) {
+                          // Prevent the default action.
+                          event.preventDefault();
+                          // Log stuff.
+                          console.log("I was just clicked!");
+                        });
+
+                        // This stops event propagation, but doesn't prevent default.
+                        $("a").on("click", function(event) {
+                          // Stop event propagation.
+                          event.stopPropagation();
+                          // Log stuff.
+                          console.log("I was just clicked!");
+                        });
+                    </code>
+                </pre>
+            </section>
+            <section>
+                <h2>Best Practices</h2>
+                <h3>Use variables "aka" Caching your jQuery objects</h3>
+                <h3>Use variables "aka" Caching your jQuery objects</h3>
+                <h3>Know your selectors!</h3>
+                <h3>Create elements efficiently!</h3>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        // Given this list of items...
+                        var arr = ["this", "is", "a", "super", "long", "list"];
+
+                        // You could iterate over all the items using jQuery methods to build
+                        // the list dynamically.
+                        var list = $("<ul/>");
+                        $.each(arr, function(index, item) {
+                          $("<li/>").html(item).appendTo(list);
+                        });
+                        list.appendTo("#target");
+
+                        // But, believe it or not, building the list as a string of HTML that
+                        // gets appended to the document at the end is much faster.
+                        var html = "";
+                        $.each(arr, function(index, item) {
+                          html += "<li>" + item + "</li>";
+                        });
+                        $("<ul>" + html + "</ul>").appendTo("#target");
+
+                        // This is one reason why templates are so popular.
+                        var tmpl = Mustache.compile("<ul>{{#items}}<li>{{.}}</li>{{/items}}</ul>");
+                        var html = tmpl({items: arr});
+                        $(html).appendTo("#target");​​​​
+                    </code>
+                </pre>
+                <h3>Do as much work offline as possible</h3>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        // This adds the class AFTER the element has been appended to the
+                        // document, which causes an unnecessary reflow.
+                        $("<p>new content</p>").appendTo("#target").addClass("highlight");
+
+                        // This adds the class before appending the element, while it is still
+                        // only in memory.
+                        $("<p>new content</p>").addClass("highlight").appendTo("#target");
+                    </code>
+                </pre>
+                <h3>Clean up after yourself!</h3>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        // Store a reference to a jQuery object containing all 5 divs on the page
+                        // in a variable.
+                        var divs = $("div");
+                        divs.length // 5
+
+                        // At some point in the future, remove the selected divs from the document.
+                        divs.remove();
+
+                        // Because jQuery objects are snapshots, the divs we removed are still
+                        // consuming memory. Removed elements still being referenced in a variable
+                        // is a major cause of memory leaks!
+                        divs.length // 5
+
+                        // Problem solved. As long as no variables point to removed elements,
+                        // they can be garbage collected by the browser.
+                        divs = null;
+                    </code>
+                </pre>
+                <h3>Namespace your events</h3>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        // Bind a "resize" event handler on window.
+                        $(window).on("resize", function() {
+                          centerMyDialog();
+                        });
+
+                        // Note that this unbinds not just the "resize" event handler YOU bound,
+                        // but ALL "resize" event handlers bound on window!
+                        $(window).off("resize");
+
+
+
+                        // Bind a "resize" and "scroll" event handler on window, using a namespace.
+                        $(window).on("resize.mydialog scroll.mydialog", function() {
+                          centerMyDialog();
+                        });
+
+                        // Unbind just your namespaced "resize" event handler bound on window.
+                        $(window).off("resize.mydialog");
+
+                        // Unbind ALL of your namespaced event handlers bound on window.
+                        $(window).off(".mydialog");
+                    </code>
+                </pre>
+                <h3>Each isn't just for iteration</h3>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        // It's most useful because it creates a per-element function scope...
+                        // In this example, every anchor shares the same global state, because the
+                        // counter var exists outside the .each callback function.
+                        var counter = 0;
+                        $("a").on("click", function(event) {
+                          event.preventDefault();
+                          counter++;
+                          console.log(counter, $(this).attr("href"));
+                        });
+
+                        // Here, each anchor has its own local state because the vars are local to
+                        // the .each callback function, and thus per-element.
+                        $("a").each(function() {
+                          var elem = $(this);
+                          var counter = 0;
+
+                          elem.on("click", function(event) {
+                            event.preventDefault();
+                            counter++;
+                            console.log(counter, elem.attr("href"));
+                          });
+                        });
+                    </code>
+                </pre>
+            </section>
+            <section>
+                <h2><a name="utilities">Utilities</a></h2>
+                <h3>Lock function context to specific "this" value.</h3>
+                <pre class="prettyprint">
+                    <code class="language-js">
+                        // The $.proxy() method allows you to lock a function context to a specific
+                        // "this" value.
+                        var name = "The window";
+                        var obj = {
+                          name: "Bocoup",
+                          printMyName: function() {
+                            $("#target").html("<h2 class=well>" + this.name + "</h2>");
+                          }
+                        };
+
+                        obj.printMyName(); // logs "Bocoup"
+
+                        // When a function isn't invoked as it's being dereferenced from an object,
+                        // the "this" value inside that function is the global object (eg. window).
+                        var whoops = obj.printMyName;
+                        whoops() // "The window"
+
+                        // With the $.proxy() method, you can bind the "this" value to an object,
+                        // in one of two ways.
+                        var reallyAwesome = $.proxy(obj, "printMyName");
+                        reallyAwesome() // "Bocoup"
+
+                        var justAsAwesome = $.proxy(obj.printMyName, obj);
+                        justAsAwesome() // "Bocoup"
+
+                        // This will log the name of the input when clicked, because jQuery sets the
+                        // "this" value inside event handlers to the DOM element, and the element
+                        // has a name property!
+                        $("input[name='first']").click(obj.printMyName);
+
+                        // This, on the other hand, will log "Bocoup" when clicked, because the "this"
+                        // value is bound to obj!
+                        $("input[name='last']").click( $.proxy(obj, "printMyName") );
+
+
+
+                        // You can utilize the $.type() method to check types in a fool-proof way,
+                        // despite how the typeof and instance operators work.
+                        //
+                        // Have you ever run into issues with typeof?
+                        typeof 1                // "number"
+                        typeof new Number(1)    // "object"
+                        typeof {a: 1}           // "object"
+                        typeof [2, 3]           // "object"
+
+                        // Worry no more, jQuery has your back!
+                        $.type(1)               // "number"
+                        $.type(new Number(1))   // "number"
+                        $.type({a: 1})          // "object"
+                        $.type([2, 3])          // "array" Awesome!
+
+                        // There are a few more specific type-related functions.
+                        $.isArray([2, 3])       // true
+                        $.isFunction($)         // true
+                        $.isPlainObject({})     // true
+
+                    </code>
+                </pre>
+            </section>
+        </article>
+    </body>
+</html>
