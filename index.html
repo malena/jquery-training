@@ -1,19 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-    <title>JavaScript Training</title>
-        <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:400,700,300' rel='stylesheet' type='text/css'>
-        <link href='css/global.css' rel='stylesheet' type='text/css'>
-        <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
-        <script src='js/jquery.min.js'></script>
-        <script src='js/TweenMax.min.js'></script>
-        <script src='js/scripts.js'></script>
-        <script>
-        $(function(){
-            new TrainingNotes();
-        });
-        </script>
-        <meta charset="UTF-8">
+        <title>JavaScript Training</title>
+        <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=js&skin=sunburst"></script>
     </head>
     <body>
         <article>
@@ -41,12 +30,12 @@
             </header>
             <section>
                 <p>jQuery implicitly iterates. So when you call jQuery methods on jQuery objects, you don't need to loop explicitly.</p>
-                <pre class="prettyprint">
-                    <code class="language-js">
+                <pre>
+                    <code>
                         $("li").html("Awesome!");
                     </code>
                 </pre>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         $("li").each(function(){
                             $(this).html("Awesome")
@@ -60,21 +49,21 @@
             </header>
             <section>
                 <p>When you select elements from the document, you select them as they exist in the document at the moment the jQuery function is called.</p>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         var allDivsInTheDocument = $("div");
                         allDivsInTheDocument.length // 10
                     </code>
                 </pre>
                 <p>The existing jQuery objects you have don't chage, even after adding more elements!</p>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         $('&#60;div&#47;>&#60;div&#47;>&#60;div&#47;>').appendTo("#target");
                         allDivsInTheDocument.length // 10
                     </code>
                 </pre>
                 <p>Selecting elements from the document by calling the jQuery function again will create a new snapshot.</p>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         var allDivsInTheDocumentNow = $("div");
                         allDivsInTheDocumentNow.length // 13
@@ -87,7 +76,7 @@
             </header>
             <section>
                 <p>You can use standard CSS selectors.</p>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
             var allDivsInTheDocument = $("div");
             var anchorChildrenOfParagraphs = $("p > a");
@@ -95,7 +84,7 @@
                     </code>
                 </pre>
                 <p>Along with standard CSS selectors, you can use custom jQuery selectors. Custom jQuery selectors are much more useful when used in certain scenarios like this.</p>
-                <pre class="prettyprint"><code class="language-js">
+                <pre><code class="language-js">
                 var currentlyAnimatingDivs = $("div:animated");
                 $("p").on("click", function() {
                     var elem = $(this);
@@ -106,7 +95,7 @@
                 </code></pre>
                 <p>Avoid custom jQuery selectors when you don't need them, because they prevent jQuery from taking advantage of native DOM methods.</p>
                 <p>Using a querySelectorAll-supported selector will be significantly faster in modern browsers. </p>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                     $("form input:submit").submit();
                     $("form input[type='submit']").submit();
@@ -118,7 +107,7 @@
             </header>
             <section>
                 <p>The "not" method filters the selected set of elements down to the subset that doesn't match the given selector. This could be anywhere from 0 to all of the initial set of elements.</p>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         var divs = $("div");
                         var divsNotAnimating = divs.not(":animated");
@@ -127,7 +116,7 @@
                     </code>
                 </pre>
                 <p>There are many jQuery custom selectors that can be used for filtering.</p>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         var firstDiv = $("div:first");
                         var lastDiv = $("div:last");
@@ -136,7 +125,7 @@
                     </code>
                 </pre>
                 <p>And for most of them, there exists a corresponding filtering method.</p>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         var firstDiv = divs.first();
                         var lastDiv = divs.last();
@@ -152,7 +141,7 @@
 
             <section>
                 <p>You can find all descendant elements of an element or all children of an element. There are all kinds of traversal methods. Parents, children, siblings, you name it.</p>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
     var form = $("#my-form");
     var inputsInForm = form.find("input");
@@ -162,7 +151,7 @@
                     </code>
                 </pre>
                 <p>Elements don't have to be in the document to be traversable.</p>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
 $("&#60;p>&#60;i/>&#60;b/>&#60;/p>");                               // [&#60;p>&#60;i>&#60;/i>&#60;b>&#60;/b>&#60;/p>]
 $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children();                    // [&#60;i>​&#60;/i>​, &#60;b>​&#60;/b>​]
@@ -178,20 +167,20 @@ $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x").parent(); // [&#60;p>&
 
             <section>
                 <p>jQuery methods are both setters, modifying every selected element</p>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         $("li").html("<b>Hello</b> <i>world</i>");
                         $("li").text("<b>Hello</b> <i>world</i>");
                     </code>
                 </pre>
                 <p>And getters. Note that methods that work as both getter and setter will only return the value for the FIRST selected element. With a few notable exception, of course.</p>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         $("li").html(); // "<i>item 1</i> content"
                         $("li").text(); // "item 1 contentitem 2 content item 3 contentitem 4 content"
                     </code>
                 </pre>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
 
                         // Most methods that work as setters and getters will also accept a
@@ -202,7 +191,7 @@ $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x").parent(); // [&#60;p>&
                         });
                     </code>
                 </pre>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
 
                         // The "each" method can be used to do the same thing more explicitly.
@@ -217,7 +206,7 @@ $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x").parent(); // [&#60;p>&
                 <h3>Attributes and Settings</h3>
             </header>
             <section>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         $("img:first").each(function() {
                             img = $(this);
@@ -250,7 +239,7 @@ $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x").parent(); // [&#60;p>&
                 <h3>Creating new elements</h3>
             </header>
             <section>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         // When creating elements, you can add attributes, properties, content, etc.
                         var graph = $('<p id="test" class="fancy"><b>hello</b> <i>world</i></p>');
@@ -280,7 +269,7 @@ $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x").parent(); // [&#60;p>&
             <section>
                 <h2><a name="events">Events</a></h2>
                 <h3>Event Delegation</h3>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         // Internally, this is exactly what jQuery event delegation does. Except
                         // the selector is specified between the event types and the handler,
@@ -299,7 +288,7 @@ $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x").parent(); // [&#60;p>&
                     </code>
                 </pre>
                 <h3>Stopping Propragation</h3>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         // This is just for illustrative purposes!
                         $("*").add([document, window]).on("click", function() {
@@ -340,7 +329,7 @@ $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x").parent(); // [&#60;p>&
                 <h3>Use variables "aka" Caching your jQuery objects</h3>
                 <h3>Know your selectors!</h3>
                 <h3>Create elements efficiently!</h3>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         // Given this list of items...
                         var arr = ["this", "is", "a", "super", "long", "list"];
@@ -368,7 +357,7 @@ $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x").parent(); // [&#60;p>&
                     </code>
                 </pre>
                 <h3>Do as much work offline as possible</h3>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         // This adds the class AFTER the element has been appended to the
                         // document, which causes an unnecessary reflow.
@@ -380,7 +369,7 @@ $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x").parent(); // [&#60;p>&
                     </code>
                 </pre>
                 <h3>Clean up after yourself!</h3>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         // Store a reference to a jQuery object containing all 5 divs on the page
                         // in a variable.
@@ -401,7 +390,7 @@ $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x").parent(); // [&#60;p>&
                     </code>
                 </pre>
                 <h3>Namespace your events</h3>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         // Bind a "resize" event handler on window.
                         $(window).on("resize", function() {
@@ -427,7 +416,7 @@ $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x").parent(); // [&#60;p>&
                     </code>
                 </pre>
                 <h3>Each isn't just for iteration</h3>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         // It's most useful because it creates a per-element function scope...
                         // In this example, every anchor shares the same global state, because the
@@ -457,7 +446,7 @@ $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x").parent(); // [&#60;p>&
             <section>
                 <h2><a name="utilities">Utilities</a></h2>
                 <h3>Lock function context to specific "this" value.</h3>
-                <pre class="prettyprint">
+                <pre>
                     <code class="language-js">
                         // The $.proxy() method allows you to lock a function context to a specific
                         // "this" value.
