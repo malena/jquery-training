@@ -38,7 +38,7 @@ h3 {
 
 p {
     font-size: 35px;
-    line-height: 55px;
+    line-height: 45px;
     font-family: 'Roboto Condensed', sans-serif; 
 }
 
@@ -49,12 +49,12 @@ a {
 
 
 header {
-    margin-bottom: 80px;
+    margin-bottom: 60px;
 }
 
 header a {
     display: block;
-    padding: 20px; 
+    padding: 20px 20px 0px 0px; 
     font-size: 30px;
     color:#036064;
 }

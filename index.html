@@ -23,9 +23,9 @@
                     <li><a href="#events" >Events</a></li>
                     <li><a href="#best-practices">Best Practices</a></li>
                     <li><a href="#utilities">Utilities</a></li>
-                    <li><a href="ajax">Ajax</a></li>
-                    <li><a href="deferreds">Deferreds</a></li>
-                    <li><a href="templates">Templates</a></li>
+                    <li><a href="#ajax">Ajax</a></li>
+                    <li><a href="#deferreds">Deferreds</a></li>
+                    <li><a href="#templates">Templates</a></li>
                 </ol>
             </section>
 
@@ -539,7 +539,6 @@
 </code>
 </pre>
 <p>When a function isn't invoked as it's being dereferenced from an object, the "this" value inside that function is the global object (eg. window).</p>
-
 <pre class="prettyprint">
 <code class="language-js">
     obj.printMyName(); // logs "Bocoup"
@@ -567,7 +566,6 @@
     $("input[name='first']").click(obj.printMyName);
 </code>
 </pre>
-
 <p>This, on the other hand, will log "Bocoup" when clicked, because the "this" value is bound to obj! </p>
 <pre class="prettyprint">
 <code class="language-js">
@@ -601,6 +599,91 @@
 </code>
 </pre>
 </section>
+<header>
+    <h2><a name="ajax">Ajax</a></h2>
+</header>
+<h3></h3>
+<p>Under the hood, Ajax requests are powered by XMLHttpRequest (aka XHR) objects. jQuery provides the $.ajax() method along with several convenience methods to make it easier to work with asynchronous requests.</p>
+
+<section>
+<p>Ajax requests run asynchronously, which means that even though the $.ajax() method returns immediately, the success callback won't fire until sometime in the future. That means that this function's return statement executes before the Ajax request completes, and thus the function returns undefined.</p>
+<pre class="prettyprint">
+<code class="language-js">
+    var getSomeData = function() {
+        var data;
+        $.ajax({
+            url: "/data/people.json",
+            dataType: "json",
+            success: function(resp) {
+              data = resp;
+            }
+        });
+        return data;
+    };
+    $("#target").html("&#60;h2 class=well>" + getSomeData().people[0].name + "&#60;/h2>");
+</code>
+</pre>
+<p>The solution in this case is to execute all code dependent on the Ajax request's response in the success callback.</p>
+
+<pre class="prettyprint">
+<code class="language-js">
+    var getSomeData = function(callback) {
+      $.ajax({
+        url: "/data/people.json",
+        dataType: "json",
+        success: function(resp) {
+          callback(resp);
+        }
+      });
+    };
+
+    getSomeData(function(resp) {
+      $("#target").html("&#60;h2 class=well>" + resp.people[0].name + "&#60;/h2>");
+    });
+</code>
+</pre>
+<p>jQuery's $.ajax() method has a few different signatures. We can provide an options object that overrides the default Ajax settings. This options object lets us specify extra data we want to send, which HTTP method (GET, POST, etc) to use, what type of data we expect to receive, and how to react when the request succeeds or fails.</p>
+<pre class='prettyprint'>
+<code class="language-js">
+    $.ajax({
+        url: "/data/people.json",
+        data: {count: 3},
+        type: "GET",
+        dataType: "json",
+        success: function(resp) {
+            $("#target").html("&#60;h2 class=well>" + resp.people[0].name + "&#60;/h2>");
+        },
+        error: function(req, status, err) {
+            console.error("Something went wrong! Status: %s (%s)", status, err);
+        }
+    });
+</code>
+</pre>
+<p>We can also provide a URL, followed by an options object.</p>
+<pre class='prettyprint'>
+<code class="language-js">
+    $.ajax("/data/people.json", {
+        data: {count: 3},
+        type: "GET",
+        dataType: "json",
+        success: function(resp) {
+            $("#target").html("&#60;h2 class=well>" + resp.people[0].name + "&#60;/h2>");
+        },
+        error: function(req, status, err) {
+            console.error("Something went wrong! Status: %s (%s)", status, err);
+        }
+    });
+</code>
+</pre>
+<p>If we don't need to override any of the default Ajax settings, we can just specify the url, and omit the options object.</p>
+<pre class='prettyprint'>
+<code class="language-js">
+   $.ajax("/data/people.json"); 
+</code>
+</pre>
+
+</section>
+
 </article>
 </body>
 </html>
