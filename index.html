@@ -20,12 +20,10 @@
             <section class="introduction">
                 <ol>
                     <li><a href="#basics">jQuery Basics</a></li>
+                    <li><a href="#scope" >Scope</a></li>
                     <li><a href="#events" >Events</a></li>
                     <li><a href="#best-practices">Best Practices</a></li>
                     <li><a href="#utilities">Utilities</a></li>
-                    <li><a href="#ajax">Ajax</a></li>
-                    <li><a href="#deferreds">Deferreds</a></li>
-                    <li><a href="#templates">Templates</a></li>
                 </ol>
             </section>
 
@@ -108,11 +106,15 @@
 <h3>JQuery Filtering</h3>
 <section>
 <p>The "not" method filters the selected set of elements down to the subset that doesn't match the given selector. This could be anywhere from 0 to all of the initial set of elements.</p>
+<p>This is really useful because you don't have to keep searching the dom for elements. You can keep working off a set of elements and create your own subset via not or filter.</p>
+<p>Always operate from a stored variable.</p>
+<p>Don't use jQuery custom selectors if you dont have to.</p> 
 <pre class="prettyprint">
 <code class="language-js">
     var divs = $("div");
     var divsNotAnimating = divs.not(":animated");
     var divsNotAnimating = divs.filter(":not(:animated)");
+    // below is not a good method since we are  having to search for divs again
     var divsNotAnimating = $("div:not(:animated)");
 </code>
 </pre>
@@ -125,7 +127,7 @@
     var divsContainingAnchors = $("div:has(a)");
 </code>
 </pre>
-<p>And for most of them, there exists a corresponding filtering method.</p>
+<p>And for most of them, there exists a corresponding filtering method. Which is super fast if you are working off a saved jquery element.</p>
 <pre class="prettyprint">
 <code class="language-js">
     var firstDiv = divs.first();
@@ -162,6 +164,8 @@
 <h3>Getters and Setters</h3>
 <section>
 <p>jQuery methods are both setters, modifying every selected element</p>
+<p>jQuery methods return jQuery objects. All filtering and trasvering methods or setters return jQuery objects which you can continue to chain.</p>
+<p>When you chain you don't need to save temporary variables</p>
 <pre class="prettyprint">
 <code class="language-js">
     $("li").html("<b>Hello</b> <i>world</i>");
@@ -199,8 +203,8 @@
 
 <pre class="prettyprint">
 <code class="language-js">
-    $("img:first").each(function() {
-        img = $(this);
+    $("img").first().each(function() {
+        var img = $(this);
     });
 </code>
 </pre>
@@ -208,7 +212,7 @@
 <p>Set the src attribute of the image.</p>
 <pre class="prettyprint">
 <code>
-    $("img:first").each(function() {
+    $("img").first().each(function() {
         img = $(this);
         img.attr("src", "/static/img/sample.gif");
     });
@@ -218,7 +222,7 @@
 <p>Get the src attribute.</p>
 <pre class="prettyprint">
 <code>
-    $("img:first").each(function() {
+    $("img").first().each(function() {
         img = $(this);
         img.attr("src", "/static/img/sample.gif");
         console.log( img.attr("src") ); // "/static/img/sample.gif"
@@ -229,7 +233,7 @@
 <p>Get the src property with jQuery.<p>
 <pre class="prettyprint">
 <code>
-    $("img:first").each(function() {
+    $("img").first().each(function() {
         img = $(this);
         img.attr("src", "/static/img/sample.gif");
         console.log( img.prop("src") ); // "http://bocoup.com/static/img/sample.gif"
@@ -240,7 +244,7 @@
 <p>But if you already have a DOM element reference, you can access properties directly from the element. This is very efficient!</p>
 <pre class="prettyprint">
 <code>
-    $("img:first").each(function() {
+    $("img").first().each(function() {
         img = $(this);
         img.attr("src", "/static/img/sample.gif");
         console.log( this.src );        // "http://bocoup.com/static/img/sample.gif"
@@ -303,12 +307,94 @@
 </section>
 
 <section>
+    <header>
+        <h2><a name="scope">Scope</a></h2>
+    </header>
+
+    <h3>Variable Hoisting</h3>
+    <p>In Javascript, you can have multiple var-statements in a function. All of these statements act as if they were declared at the top of the function. Hoisting is the act of moving the declarations to the top of the function.</p>
+    <pre class="prettyprint">
+    <code>
+        var myvar = "global variable";
+        function mymethod(){
+            alert(myvar);   // expected "global variable", result: undefined
+            var myvar = "local variable";
+            alert(myvar); // local variable
+        }
+        mymethod();
+    </code>
+    </pre>
+    <p>Which is equivalent to this</p>
+    <pre class="prettyprint">
+    <code>
+        var myvar = "global variable";
+        function mymethod(){
+            var myvar;  // this is the same as var myvar = undefined;
+            alert(myvar);   // undefined
+            myvar = "local variable";
+            alert(myvar); // local variable
+        }
+        mymethod(); 
+    </code>
+    </pre>
+
+    <h3>Function Hoisting</h3>
+    <p>When we are declaring functions inside a function there are two patterns available: function expressions and function declarations:</p>
+    <pre class="prettyprint">
+    <code>
+    function something(){  
+        // function declaration
+        function mymethod(){}
+             
+        // function expression
+        var mysecondmethod = function() {};
+         
+        mymethod();
+        mysecondmethod();
+    }
+    </code>
+    </pre>
+    <p>As you can see, both implementations are valid and you can call them using the same syntax. This might lead you to believe that they are in fact equivalent. However, there is a small difference when it comes to hoisting: function declarations get hoisted completely (name AND implementation) whereas function expressions get only the variable declaration hoisted and not the implementation.</p>
+    <pre class="prettyprint">
+    <code>
+    function mymethod(){
+       alert("global mymethod");
+    }
+ 
+    function mysecondmethod(){
+       alert("global mysecondmethod");
+    }
+ 
+    function hoisting(){
+        alert(typeof mymethod);
+        alert(typeof mysecondmethod);
+         
+        mymethod();         // local mymethod
+        mysecondmethod(); // TypeError: undefined is not a function
+         
+        // mymethod AND the implementation get hoisted
+        function mymethod(){
+            alert("local mymethod");  
+        }
+     
+        // Only the variable mysecondmethod get's hoisted
+        var mysecondmethod = function() {
+            alert("local mysecondmethod");  
+        };
+    }
+
+    hoisting();
+    </code>
+    </pre>
+
+</section>
+
+<section>
 <header>
     <h2><a name="events">Events</a></h2>
 </header>
 
-<h3>Event Delegation</h3>
-<p>Internally, this is exactly what jQuery event delegation does. Except the selector is specified between the event types and the handler, `this` is the element that matched that selector, and it's MUCH more efficient than if it was done manually with .closest().</p>
+<h3>Event Delegation</h3> <p>Internally, this is exactly what jQuery event delegation does. Except the selector is specified between the event types and the handler, `this` is the element that matched that selector, and it's MUCH more efficient than if it was done manually with .closest().</p>
 <pre class="prettyprint">
 <code>
     $(document).on("mouseover mouseout", "li", function(event) {
@@ -598,90 +684,6 @@
     $.isPlainObject({})     // true
 </code>
 </pre>
-</section>
-<header>
-    <h2><a name="ajax">Ajax</a></h2>
-</header>
-<h3></h3>
-<p>Under the hood, Ajax requests are powered by XMLHttpRequest (aka XHR) objects. jQuery provides the $.ajax() method along with several convenience methods to make it easier to work with asynchronous requests.</p>
-
-<section>
-<p>Ajax requests run asynchronously, which means that even though the $.ajax() method returns immediately, the success callback won't fire until sometime in the future. That means that this function's return statement executes before the Ajax request completes, and thus the function returns undefined.</p>
-<pre class="prettyprint">
-<code class="language-js">
-    var getSomeData = function() {
-        var data;
-        $.ajax({
-            url: "/data/people.json",
-            dataType: "json",
-            success: function(resp) {
-              data = resp;
-            }
-        });
-        return data;
-    };
-    $("#target").html("&#60;h2 class=well>" + getSomeData().people[0].name + "&#60;/h2>");
-</code>
-</pre>
-<p>The solution in this case is to execute all code dependent on the Ajax request's response in the success callback.</p>
-
-<pre class="prettyprint">
-<code class="language-js">
-    var getSomeData = function(callback) {
-      $.ajax({
-        url: "/data/people.json",
-        dataType: "json",
-        success: function(resp) {
-          callback(resp);
-        }
-      });
-    };
-
-    getSomeData(function(resp) {
-      $("#target").html("&#60;h2 class=well>" + resp.people[0].name + "&#60;/h2>");
-    });
-</code>
-</pre>
-<p>jQuery's $.ajax() method has a few different signatures. We can provide an options object that overrides the default Ajax settings. This options object lets us specify extra data we want to send, which HTTP method (GET, POST, etc) to use, what type of data we expect to receive, and how to react when the request succeeds or fails.</p>
-<pre class='prettyprint'>
-<code class="language-js">
-    $.ajax({
-        url: "/data/people.json",
-        data: {count: 3},
-        type: "GET",
-        dataType: "json",
-        success: function(resp) {
-            $("#target").html("&#60;h2 class=well>" + resp.people[0].name + "&#60;/h2>");
-        },
-        error: function(req, status, err) {
-            console.error("Something went wrong! Status: %s (%s)", status, err);
-        }
-    });
-</code>
-</pre>
-<p>We can also provide a URL, followed by an options object.</p>
-<pre class='prettyprint'>
-<code class="language-js">
-    $.ajax("/data/people.json", {
-        data: {count: 3},
-        type: "GET",
-        dataType: "json",
-        success: function(resp) {
-            $("#target").html("&#60;h2 class=well>" + resp.people[0].name + "&#60;/h2>");
-        },
-        error: function(req, status, err) {
-            console.error("Something went wrong! Status: %s (%s)", status, err);
-        }
-    });
-</code>
-</pre>
-<p>If we don't need to override any of the default Ajax settings, we can just specify the url, and omit the options object.</p>
-<pre class='prettyprint'>
-<code class="language-js">
-   $.ajax("/data/people.json"); 
-</code>
-</pre>
-
 </section>
 
 </article>
