@@ -394,7 +394,8 @@
     <h2><a name="events">Events</a></h2>
 </header>
 
-<h3>Event Delegation</h3> <p>Internally, this is exactly what jQuery event delegation does. Except the selector is specified between the event types and the handler, `this` is the element that matched that selector, and it's MUCH more efficient than if it was done manually with .closest().</p>
+<h3>Event Delegation</h3> 
+<p>Internally, this is exactly what jQuery event delegation does. Except the selector is specified between the event types and the handler, `this` is the element that matched that selector, and it's MUCH more efficient than if it was done manually with .closest().</p>
 <pre class="prettyprint">
 <code>
     $(document).on("mouseover mouseout", "li", function(event) {
