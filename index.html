@@ -153,8 +153,8 @@
 <pre class="prettyprint">
 <code class="language-js">
     $("&#60;p>&#60;i/>&#60;b/>&#60;/p>");                               // [&#60;p>&#60;i>&#60;/i>&#60;b>&#60;/b>&#60;/p>]
-    $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children();                    // [&#60;i>​&#60;/i>​, &#60;b>​&#60;/b>​]
-    $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x");          // [&#60;i>​x&#60;/i>​, &#60;b>x​&#60;/b>​]
+    $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children();                    // [&#60;i>&#60;/i>, &#60;b>&#60;/b>]
+    $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x");          // [&#60;i>x&#60;/i>, &#60;b>x&#60;/b>]
     $("&#60;p>&#60;i/>&#60;b/>&#60;/p>").children().text("x").parent(); // [&#60;p>&#60;i>x&#60;/i>&#60;b>x&#60;/b>&#60;/p>]
 </code>
 </pre>
@@ -235,7 +235,7 @@
     $("img").first().each(function() {
         img = $(this);
         img.attr("src", "/static/img/sample.gif");
-        console.log( img.prop("src") ); // "http://bocoup.com/static/img/sample.gif"
+        console.log( img.prop("src") ); // "http://example.com/static/img/sample.gif"
     });
 </code>
 </pre>
@@ -246,7 +246,7 @@
     $("img").first().each(function() {
         img = $(this);
         img.attr("src", "/static/img/sample.gif");
-        console.log( this.src );        // "http://bocoup.com/static/img/sample.gif"
+        console.log( this.src );        // "http://example.com/static/img/sample.gif"
     });
 </code>
 </pre>
@@ -396,13 +396,122 @@
     <h2><a name="events">Events</a></h2>
 </header>
 <article>
+<h3>Binding & Unbinding Events</h3> 
+<section>
+
+<p>When you use the preferred "on" method (the old "bind" method works too), you have a lot more flexibility.</p>
+<pre class="prettyprint">
+<code>
+    $("a").on("click", function(event) {
+      console.log("clicked", $(this).attr("href"));
+    });
+</code>
+</pre>
+
+<p>For example, when you unbind event handlers, you unbind EVERY event handler of the specified type, bound to all selected elements.</p>
+
+<pre class="prettyprint">
+<code>
+   $("a").off("click");
+</code>
+</pre>
+
+<p>But if you bind using a named function</p>
+<pre class="prettyprint">
+<code>
+    function myClickHandler(event) {
+        console.log("clicked", $(this).attr("href"));
+    }
+    $("a").on("click", myClickHandler);
+</code>
+</pre>
+<p>..and unbind using the same named function, only the event handlers // bound using that function will be unbound, leaving other event handlers of that type, on the selected elements untouched.</p> 
+<pre class="prettyprint">
+<code>
+    $("a").off("click", myClickHandler);
+</code>
+</pre>
+
+<p>And if you bind using namespaces...</p>
+<pre class="prettyprint">
+<code>
+    $("a").on("click.mynamespace", function(event) {
+        console.log("clicked", $(this).attr("href"));
+    });
+</code>
+</pre>
+<p>...and unbind using the same namespace, only the event handlers bound with that namespace will be unbound, leaving other event handlers of that type, on the selected elements untouched.</p>
+<pre class="prettyprint">
+<code>
+    $("a").off("click.mynamespace");
+</code>
+</pre>
+
+<p>You can bind multiple event types at once (with optional namespaces)...</p>
+<pre class="prettyprint">
+<code>
+    $(window).on("resize.mymodal scroll.mymodal", function(event) {
+        repositionModalDialog();
+    });
+</code>
+</pre>
+
+<p>...and unbind them all at once, using just the namespace.</p>
+<pre class="prettyprint">
+<code>
+    $(window).off(".mymodal");
+</code>
+</pre>
+</section>
+
 <h3>Event Delegation</h3> 
 <section>
-<p>Internally, this is exactly what jQuery event delegation does. Except the selector is specified between the event types and the handler, `this` is the element that matched that selector, and it's MUCH more efficient than if it was done manually with .closest().</p>
+
+<p>With this markup</p>
+
+<pre class="prettyprint">
+<code>
+    &#60;a href="#foo">I am a Link!&#60;/a>
+    &#60;a href="#bar">I am another Link!&#60;/a>
+</code>
+</pre>
+
+<p>This works like you'd expect, right?</p>
+<pre class="prettyprint">
+<code>
+    $("a").on("click", function(event) {
+        event.preventDefault();
+        console.log( $(this).attr("href") );
+    }); 
+</code>
+</pre>
+
+<p>How about with this markup?</p>
+<pre class="prettyprint">
+<code>
+    &#60;a href="#foo">&#60;span>I am a Link!&#60;/span>&#60;/a>
+    &#60;a href="#bar">&#60;b>&#60;i>I am another Link&#60;/i>&#60;/b>!&#60;/a>
+</code>
+</pre>
+
+<p>It still works, even though you're not actually clicking the anchors. You're really clicking the "span" or "i" descendant elements of the anchors, but since they're inside the anchors, you're effectively clicking the anchors. This behavior we take for granted is called "event delegation."</p>
+
+<p>Knowing this, how might you utilize event delegation in your code?</p>
+<pre class="prettyprint">
+<code>
+    $(document).on("mouseover mouseout", function(event) {
+        var elem = $(event.target);
+        if ( elem.is("li") ) {
+            elem.toggleClass("highlight");
+        }
+    }); 
+</code>
+</pre>
+<p>Utilizing implicit iteration, the previous example could be written more like this:</p>
 <pre class="prettyprint">
 <code>
     $(document).on("mouseover mouseout", "li", function(event) {
-        $(this).toggleClass("highlight");
+      $(this).toggleClass("highlight");
     });
 </code>
 </pre>
@@ -635,7 +744,7 @@
 <code class="language-js">
     var name = "The window";
     var obj = {
-    name: "Bocoup",
+    name: "example",
         printMyName: function() {
             $("#target").html("&#60;h2 class=well>" + this.name + "&#60;/h2>");
         }
@@ -645,7 +754,7 @@
 <p>When a function isn't invoked as it's being dereferenced from an object, the "this" value inside that function is the global object (eg. window).</p>
 <pre class="prettyprint">
 <code class="language-js">
-    obj.printMyName(); // logs "Bocoup"
+    obj.printMyName(); // logs "example"
     var whoops = obj.printMyName;
     whoops() // "The window"
 </code>
@@ -654,14 +763,14 @@
 <pre class="prettyprint">
 <code class="language-js">
     var reallyAwesome = $.proxy(obj, "printMyName");
-    reallyAwesome() // "Bocoup"
+    reallyAwesome() // "example"
 </code>
 </pre>
 <p>
 <pre class="prettyprint">
 <code class="language-js">
     var justAsAwesome = $.proxy(obj.printMyName, obj);
-    justAsAwesome() // "Bocoup"
+    justAsAwesome() // "example"
 </code>
 </pre>
 <p>This will log the name of the input when clicked, because jQuery sets the "this" value inside event handlers to the DOM element, and the element has a name property!</p>
@@ -670,7 +779,7 @@
     $("input[name='first']").click(obj.printMyName);
 </code>
 </pre>
-<p>This, on the other hand, will log "Bocoup" when clicked, because the "this" value is bound to obj! </p>
+<p>This, on the other hand, will log "example" when clicked, because the "this" value is bound to obj! </p>
 <pre class="prettyprint">
 <code class="language-js">
     $("input[name='last']").click( $.proxy(obj, "printMyName") );
