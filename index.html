@@ -15,9 +15,7 @@
         </script>
     </head>
     <body>
-        <article>
-            <h1>JS Fundamentals</h1>
-            <section class="introduction">
+            <nav class="table-of-contents">
                 <ol>
                     <li><a href="#basics">jQuery Basics</a></li>
                     <li><a href="#scope" >Scope</a></li>
@@ -25,12 +23,13 @@
                     <li><a href="#best-practices">Best Practices</a></li>
                     <li><a href="#utilities">Utilities</a></li>
                 </ol>
-            </section>
+            </nav>
 
 <header>
     <h2><a name="basics">jQuery Basics</a></h2>
 </header>
 
+<article>
 <h3>jQuery Objects are array-like</h3>
 <section>
 <p>jQuery implicitly iterates. So when you call jQuery methods on jQuery objects, you don't need to loop explicitly.</p>
@@ -305,13 +304,14 @@
 </code>
 </pre>
 </section>
+</article>
 
+<header>
+    <h2><a name="scope">Scope</a></h2>
+</header>
+<article>
+<h3>Variable Hoisting</h3>
 <section>
-    <header>
-        <h2><a name="scope">Scope</a></h2>
-    </header>
-
-    <h3>Variable Hoisting</h3>
     <p>In Javascript, you can have multiple var-statements in a function. All of these statements act as if they were declared at the top of the function. Hoisting is the act of moving the declarations to the top of the function.</p>
     <pre class="prettyprint">
     <code>
@@ -338,7 +338,10 @@
     </code>
     </pre>
 
-    <h3>Function Hoisting</h3>
+</section>
+
+<h3>Function Hoisting</h3>
+<section>
     <p>When we are declaring functions inside a function there are two patterns available: function expressions and function declarations:</p>
     <pre class="prettyprint">
     <code>
@@ -386,15 +389,15 @@
     hoisting();
     </code>
     </pre>
-
 </section>
+</article>
 
-<section>
 <header>
     <h2><a name="events">Events</a></h2>
 </header>
-
+<article>
 <h3>Event Delegation</h3> 
+<section>
 <p>Internally, this is exactly what jQuery event delegation does. Except the selector is specified between the event types and the handler, `this` is the element that matched that selector, and it's MUCH more efficient than if it was done manually with .closest().</p>
 <pre class="prettyprint">
 <code>
@@ -410,8 +413,10 @@
     $("li").clone().insertAfter("li");
 </code>
 </pre>
+</section>
 
 <h3>Stopping Propragation</h3>
+<section/>
 <p>This is just for illustrative purposes!</p>
 <pre class="prettyprint">
 <code class="language-js">
@@ -454,16 +459,15 @@
 </code>
 </pre>
 </section>
-<section>
+
+</article>
 
 <header>
     <h2><a name="best-practices">Best Practices</a></h2>
 </header>
-
+<article>
 <h3>Use variables "aka" Caching your jQuery objects</h3>
-<h3>Know your selectors!</h3>
-<h3>Create elements efficiently!</h3>
-
+<section>
 <p>Given this list of items... </p>
 <pre class="prettyprint">
 <code class="language-js">
@@ -500,8 +504,10 @@
     $(html).appendTo("#target");
 </code>
 </pre>
+</section>
 
 <h3>Do as much work offline as possible</h3>
+<section>
 <p>This adds the class AFTER the element has been appended to the document, which causes an unnecessary reflow.</p>
 <pre class="prettyprint">
 <code class="language-js">
@@ -514,7 +520,11 @@
     $("&#60;p>new content&#60;/p>").addClass("highlight").appendTo("#target");
 </code>
 </pre>
+</section>
+
 <h3>Clean up after yourself!</h3>
+
+<section>
 <p>Store a reference to a jQuery object containing all 5 divs on the page in a variable.</p>
 <pre class="prettyprint">
 <code class="language-js">
@@ -541,7 +551,10 @@
 </code>
 </pre>
 
+</section>
+
 <h3>Namespace your events</h3>
+<section>
 <p>Bind a "resize" event handler on window.</p>
 
 <pre class="prettyprint">
@@ -578,7 +591,10 @@
 </code>
 </pre>
 
+</section>
+
 <h3>Each isn't just for iteration</h3>
+<section>
 <p>It's most useful because it creates a per-element function scope... In this example, every anchor shares the same global state, because the counter var exists outside the .each callback function.</p>
 <pre class="prettyprint">
 <code class="language-js">
@@ -606,13 +622,14 @@
 </code>
 </pre>
 </section>
+</article>
 
-<section>
 <header>
     <h2><a name="utilities">Utilities</a></h2>
 </header>
-
+<article>
 <h3>Lock function context to specific "this" value.</h3>
+<section>
 <p>The $.proxy() method allows you to lock a function context to a specific "this" value.</p>
 <pre class="prettyprint">
 <code class="language-js">
